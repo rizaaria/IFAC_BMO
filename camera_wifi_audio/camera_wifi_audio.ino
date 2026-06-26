@@ -10,12 +10,12 @@ using namespace audio_tools;
 using namespace audio_driver;
 
 // WIFI
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
-IPAddress serverIP(192,168,137,1);
+IPAddress serverIP(192, 168, 137, 1);
 const uint16_t AUDIO_PORT = 5005;
-  
+
 // UDP
 WiFiUDP udp_audio;
 
@@ -53,12 +53,13 @@ void setup() {
 
   if (!audio.begin(cfg)) {
     Serial.println("Audio FAIL");
-    while (1);
+    while (1)
+      ;
   }
 
   udp_tts.begin(6001);
 
-  audio.setVolume(0.2);  // range: 0.0 - 1.0
+  audio.setVolume(0.2); // range: 0.0 - 1.0
 
   Serial.println("Audio OK");
 }
@@ -68,12 +69,13 @@ void loop() {
 
   if (audio.available()) {
     int r = audio.readBytes(frame + mic_got, FRAME_BYTES - mic_got);
-    if (r > 0) mic_got += r;
+    if (r > 0)
+      mic_got += r;
   }
 
   if (mic_got >= FRAME_BYTES) {
 
-    int16_t *samples = (int16_t*)frame;
+    int16_t *samples = (int16_t *)frame;
 
     // 🔥 Gain ringan saja (jangan terlalu besar)
     for (int i = 0; i < FRAME_SAMPLES; i++) {
@@ -81,8 +83,10 @@ void loop() {
 
       s = s * 1.8; // 🔥 sweet spot (1.5 - 2.0)
 
-      if (s > 32767) s = 32767;
-      if (s < -32768) s = -32768;
+      if (s > 32767)
+        s = 32767;
+      if (s < -32768)
+        s = -32768;
 
       samples[i] = (int16_t)s;
     }
@@ -102,5 +106,4 @@ void loop() {
       audio.write(tts_buf, len);
     }
   }
-
 }

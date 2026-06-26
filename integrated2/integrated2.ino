@@ -1,10 +1,10 @@
+#include "esp_camera.h"
+#include "img_converters.h"
+#include <Adafruit_PWMServoDriver.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
-#include "esp_camera.h"
-#include "img_converters.h"
-#include <Adafruit_PWMServoDriver.h>
 
 // AUDIO
 #include "AudioTools.h"
@@ -15,19 +15,19 @@ using namespace audio_tools;
 using namespace audio_driver;
 
 // ================= WIFI =================
-const char *ssid     = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
 // ⚠️ IP PC kamu — cek dengan ipconfig di hotspot yang sama
 // Ganti angka terakhir sesuai IP PC kamu di jaringan redmi
-IPAddress serverIP(192,168,137,1);  // ← GANTI sesuai IP PC kamu
+IPAddress serverIP(192, 168, 137, 1); // ← GANTI sesuai IP PC kamu
 
 // ================= PORT =================
-const uint16_t CAM_PORT   = 5000;
+const uint16_t CAM_PORT = 5000;
 const uint16_t AUDIO_PORT = 5005;
 const uint16_t SERVO_PORT = 6002;
-const uint16_t TEXT_PORT  = 6000;
-const uint16_t TTS_PORT   = 6001;
+const uint16_t TEXT_PORT = 6000;
+const uint16_t TTS_PORT = 6001;
 
 // ================= UDP =================
 WiFiUDP udp_cam, udp_audio, udp_servo, udp_text, udp_tts;
@@ -37,13 +37,13 @@ AudioInfo info(16000, 1, 16);
 AudioBoardStream audio(ESP32S3AISmartSpeaker);
 
 #define FRAME_SAMPLES 320
-#define FRAME_BYTES   (FRAME_SAMPLES * 2)
+#define FRAME_BYTES (FRAME_SAMPLES * 2)
 
-uint8_t  mic_frame[FRAME_BYTES];
-uint8_t  pkt[6 + FRAME_BYTES];
-uint16_t seq     = 0;
-uint32_t ts      = 0;
-size_t   mic_got = 0;
+uint8_t mic_frame[FRAME_BYTES];
+uint8_t pkt[6 + FRAME_BYTES];
+uint16_t seq = 0;
+uint32_t ts = 0;
+size_t mic_got = 0;
 
 uint8_t tts_buf[1400];
 
@@ -52,24 +52,24 @@ uint8_t tts_buf[1400];
 #define TXD2 9
 
 // ================= CAMERA =================
-#define CAM_PIN_PWDN  -1
+#define CAM_PIN_PWDN -1
 #define CAM_PIN_RESET -1
-#define CAM_PIN_XCLK  43
-#define CAM_PIN_SIOD  11
-#define CAM_PIN_SIOC  10
-#define CAM_PIN_D7    48
-#define CAM_PIN_D6    47
-#define CAM_PIN_D5    46
-#define CAM_PIN_D4    45
-#define CAM_PIN_D3    39
-#define CAM_PIN_D2    18
-#define CAM_PIN_D1    17
-#define CAM_PIN_D0    2
+#define CAM_PIN_XCLK 43
+#define CAM_PIN_SIOD 11
+#define CAM_PIN_SIOC 10
+#define CAM_PIN_D7 48
+#define CAM_PIN_D6 47
+#define CAM_PIN_D5 46
+#define CAM_PIN_D4 45
+#define CAM_PIN_D3 39
+#define CAM_PIN_D2 18
+#define CAM_PIN_D1 17
+#define CAM_PIN_D0 2
 #define CAM_PIN_VSYNC 21
-#define CAM_PIN_HREF  1
-#define CAM_PIN_PCLK  44
+#define CAM_PIN_HREF 1
+#define CAM_PIN_PCLK 44
 
-#define UDP_CHUNK      1400
+#define UDP_CHUNK 1400
 #define FRAME_HEADER_0 0xAA
 #define FRAME_HEADER_1 0x55
 
@@ -115,29 +115,29 @@ bool camera_init() {
 
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer   = LEDC_TIMER_0;
-  config.pin_d0       = CAM_PIN_D0;
-  config.pin_d1       = CAM_PIN_D1;
-  config.pin_d2       = CAM_PIN_D2;
-  config.pin_d3       = CAM_PIN_D3;
-  config.pin_d4       = CAM_PIN_D4;
-  config.pin_d5       = CAM_PIN_D5;
-  config.pin_d6       = CAM_PIN_D6;
-  config.pin_d7       = CAM_PIN_D7;
-  config.pin_xclk     = CAM_PIN_XCLK;
-  config.pin_pclk     = CAM_PIN_PCLK;
-  config.pin_vsync    = CAM_PIN_VSYNC;
-  config.pin_href     = CAM_PIN_HREF;
+  config.ledc_timer = LEDC_TIMER_0;
+  config.pin_d0 = CAM_PIN_D0;
+  config.pin_d1 = CAM_PIN_D1;
+  config.pin_d2 = CAM_PIN_D2;
+  config.pin_d3 = CAM_PIN_D3;
+  config.pin_d4 = CAM_PIN_D4;
+  config.pin_d5 = CAM_PIN_D5;
+  config.pin_d6 = CAM_PIN_D6;
+  config.pin_d7 = CAM_PIN_D7;
+  config.pin_xclk = CAM_PIN_XCLK;
+  config.pin_pclk = CAM_PIN_PCLK;
+  config.pin_vsync = CAM_PIN_VSYNC;
+  config.pin_href = CAM_PIN_HREF;
   config.pin_sccb_sda = CAM_PIN_SIOD;
   config.pin_sccb_scl = CAM_PIN_SIOC;
-  config.pin_pwdn     = CAM_PIN_PWDN;
-  config.pin_reset    = CAM_PIN_RESET;
+  config.pin_pwdn = CAM_PIN_PWDN;
+  config.pin_reset = CAM_PIN_RESET;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_RGB565;
-  config.frame_size   = FRAMESIZE_QVGA;
-  config.fb_count     = 1;
-  config.fb_location  = CAMERA_FB_IN_PSRAM;
-  config.grab_mode    = CAMERA_GRAB_LATEST;
+  config.frame_size = FRAMESIZE_QVGA;
+  config.fb_count = 1;
+  config.fb_location = CAMERA_FB_IN_PSRAM;
+  config.grab_mode = CAMERA_GRAB_LATEST;
 
   if (esp_camera_init(&config) != ESP_OK) {
     Serial.println("[Camera] FAILED ❌");
@@ -160,14 +160,16 @@ void setup() {
   cfg.copyFrom(info);
   if (!audio.begin(cfg)) {
     Serial.println("[Audio] FAIL ❌");
-    while (1);
+    while (1)
+      ;
   }
   Serial.println("[Audio] OK ✅");
 
   // STEP 2: Kamera
   if (!camera_init()) {
     Serial.println("STOP: Camera error");
-    while (1);
+    while (1)
+      ;
   }
 
   // STEP 3: Servo (TwoWire bus 0, pin 5/6)
@@ -197,16 +199,17 @@ void loop() {
   // ===== MIC → UDP =====
   if (audio.available() > 0) {
     int r = audio.readBytes(mic_frame + mic_got, FRAME_BYTES - mic_got);
-    if (r > 0) mic_got += r;
+    if (r > 0)
+      mic_got += r;
   }
 
   if (mic_got >= FRAME_BYTES) {
     pkt[0] = seq & 0xFF;
     pkt[1] = seq >> 8;
-    pkt[2] = ts  & 0xFF;
-    pkt[3] = ts  >> 8;
-    pkt[4] = ts  >> 16;
-    pkt[5] = ts  >> 24;
+    pkt[2] = ts & 0xFF;
+    pkt[3] = ts >> 8;
+    pkt[4] = ts >> 16;
+    pkt[5] = ts >> 24;
     memcpy(pkt + 6, mic_frame, FRAME_BYTES);
 
     udp_audio.beginPacket(serverIP, AUDIO_PORT);
@@ -222,14 +225,14 @@ void loop() {
   camera_fb_t *fb = esp_camera_fb_get();
   if (fb) {
     uint8_t *jpg_buf = NULL;
-    size_t   jpg_len = 0;
+    size_t jpg_len = 0;
 
     if (frame2jpg(fb, 70, &jpg_buf, &jpg_len)) {
       uint16_t totalPackets = (jpg_len + UDP_CHUNK - 1) / UDP_CHUNK;
 
       for (uint16_t i = 0; i < totalPackets; i++) {
         uint32_t offset = i * UDP_CHUNK;
-        uint16_t size   = min((uint32_t)UDP_CHUNK, jpg_len - offset);
+        uint16_t size = min((uint32_t)UDP_CHUNK, jpg_len - offset);
 
         udp_cam.beginPacket(serverIP, CAM_PORT);
         udp_cam.write(FRAME_HEADER_0);

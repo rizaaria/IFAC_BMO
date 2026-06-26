@@ -1,8 +1,8 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
 IPAddress pcIP(192, 168, 137, 1); // GANTI IP PC
 const uint16_t udpPort = 5000;

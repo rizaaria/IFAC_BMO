@@ -1,19 +1,20 @@
 #include "esp_camera.h"
 #include "img_converters.h"
+#include <Adafruit_PWMServoDriver.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
-#include <Adafruit_PWMServoDriver.h>
+
 
 // ================= WIFI =================
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
 IPAddress serverIP(192, 168, 137, 1);
 
 // ================= PORT =================
-const uint16_t CAM_PORT   = 5000;
+const uint16_t CAM_PORT = 5000;
 const uint16_t SERVO_PORT = 6002;
 
 // ================= UDP =================
@@ -65,7 +66,8 @@ void setServo(uint8_t ch, int angle) {
 // ================= WIFI =================
 void wifi_connect() {
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) delay(300);
+  while (WiFi.status() != WL_CONNECTED)
+    delay(300);
 
   Serial.print("ESP32 IP: ");
   Serial.println(WiFi.localIP());
@@ -76,7 +78,7 @@ bool camera_init() {
   camera_config_t config;
 
   config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer   = LEDC_TIMER_0;
+  config.ledc_timer = LEDC_TIMER_0;
 
   config.pin_d0 = CAM_PIN_D0;
   config.pin_d1 = CAM_PIN_D1;

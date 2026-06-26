@@ -7,8 +7,8 @@
 // #include <Adafruit_PWMServoDriver.h>
 
 // // ================= WIFI =================
-// const char *ssid = "SHIZUDELTA";
-// const char *password = "rizaaria12";
+// const char *ssid = "";
+// const char *password = "";
 
 // IPAddress serverIP(10,60,56,96);
 
@@ -222,13 +222,14 @@
 //   delay(5);
 // }
 
+#include "esp_camera.h"
+#include "img_converters.h"
+#include <Adafruit_PWMServoDriver.h>
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <Wire.h>
-#include "esp_camera.h"
-#include "img_converters.h"
-#include <Adafruit_PWMServoDriver.h>
+
 
 // AUDIO
 #include "AudioTools.h"
@@ -239,16 +240,16 @@ using namespace audio_tools;
 using namespace audio_driver;
 
 // ================= WIFI =================
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
-IPAddress serverIP(10,60,56,96);
+const char *ssid = "";
+const char *password = "";
+IPAddress serverIP(10, 60, 56, 96);
 
 // ================= PORT =================
-const uint16_t CAM_PORT   = 5000;
+const uint16_t CAM_PORT = 5000;
 const uint16_t AUDIO_PORT = 5005;
 const uint16_t SERVO_PORT = 6002;
-const uint16_t TEXT_PORT  = 6000;
-const uint16_t TTS_PORT   = 6001;
+const uint16_t TEXT_PORT = 6000;
+const uint16_t TTS_PORT = 6001;
 
 // ================= UDP =================
 WiFiUDP udp_cam, udp_audio, udp_servo, udp_text, udp_tts;
@@ -336,7 +337,7 @@ bool camera_init() {
   camera_config_t config;
 
   config.ledc_channel = LEDC_CHANNEL_0;
-  config.ledc_timer   = LEDC_TIMER_0;
+  config.ledc_timer = LEDC_TIMER_0;
 
   config.pin_d0 = CAM_PIN_D0;
   config.pin_d1 = CAM_PIN_D1;
@@ -388,14 +389,16 @@ void setup() {
 
   if (!audio.begin(cfg)) {
     Serial.println("[Audio] FAIL ❌");
-    while (1);
+    while (1)
+      ;
   }
   Serial.println("[Audio] OK ✅");
 
   // 🔥 2. CAMERA setelah audio
   if (!camera_init()) {
     Serial.println("STOP: Camera error");
-    while (1);
+    while (1)
+      ;
   }
 
   // 🔥 3. BARU SERVO (Wire1 beda bus)
@@ -410,14 +413,14 @@ void setup() {
   Serial.println("========== SYSTEM READY ==========");
 }
 
-
 // ================= LOOP =================
 void loop() {
 
   // ===== MIC STREAM =====
   if (audio.available() > 0) {
     int r = audio.readBytes(frame + mic_got, FRAME_BYTES - mic_got);
-    if (r > 0) mic_got += r;
+    if (r > 0)
+      mic_got += r;
   }
 
   if (mic_got >= FRAME_BYTES) {

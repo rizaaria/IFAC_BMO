@@ -3,7 +3,6 @@
 #include <WiFiUdp.h>
 #include <Wire.h>
 
-
 #include "AudioTools.h"
 #include "AudioTools/AudioLibs/AudioBoardStream.h"
 #include "ESP32S3AISmartSpeaker.h"
@@ -12,8 +11,8 @@ using namespace audio_tools;
 using namespace audio_driver;
 
 // ================= WIFI =================
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
 IPAddress serverIP(192, 168, 137, 1);
 

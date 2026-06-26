@@ -21,8 +21,8 @@ using namespace audio_driver;
 // ============================================================
 // WIFI CONFIG
 // ============================================================
-const char *WIFI_SSID = "Shizu";
-const char *WIFI_PASS = "rizaaria12";
+const char *WIFI_SSID = "";
+const char *WIFI_PASS = "";
 
 // ============================================================
 // NETWORK CONFIG

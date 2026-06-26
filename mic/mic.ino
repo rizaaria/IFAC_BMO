@@ -17,10 +17,10 @@
 // WiFiUDP udp;
 
 // // ====== set these ======
-// // const char* WIFI_SSID = "POCOM4Pro";
-// // const char* WIFI_PASS = "poco12345";
-// const char* WIFI_SSID = "Bu Erni 2";
-// const char* WIFI_PASS = "4mb4r4ni";
+// // const char* WIFI_SSID = "";
+// // const char* WIFI_PASS = "";
+// const char* WIFI_SSID = "";
+// const char* WIFI_PASS = "";
 
 // // Wireless LAN adapter Wi-Fi:
 // // IPv4 Address. . . . . . . . . . . : 10.250.32.130
@@ -106,12 +106,6 @@
 //   ts += FRAME_SAMPLES; // advance by samples per frame
 // }
 
-
-
-
-
-
-
 // Mic + With CYD
 #include <Arduino.h>
 #include <WiFi.h>
@@ -131,20 +125,20 @@ AudioBoardStream audio(ESP32S3AISmartSpeaker);
 WiFiUDP udp_audio;
 WiFiUDP udp_text;
 
-const char* WIFI_SSID = "POCOM4Pro";
-const char* WIFI_PASS = "mafuyu69";
+const char *WIFI_SSID = "";
+const char *WIFI_PASS = "";
 
-IPAddress PC_IP(10,250,32,130); //Python IP
+IPAddress PC_IP(10, 250, 32, 130); // Python IP
 const uint16_t PC_PORT = 5005;
 const uint16_t TEXT_PORT = 6000;
 
 HardwareSerial SerialCYD(2);
 
 static uint16_t seq = 0;
-static uint32_t ts  = 0;
+static uint32_t ts = 0;
 
 static const int FRAME_SAMPLES = 320;
-static const int FRAME_BYTES   = FRAME_SAMPLES * 2;
+static const int FRAME_BYTES = FRAME_SAMPLES * 2;
 static uint8_t frame[FRAME_BYTES];
 static uint8_t pkt[6 + FRAME_BYTES];
 
@@ -165,8 +159,10 @@ static bool read_exact(Stream &s, uint8_t *dst, size_t n) {
   uint32_t t0 = millis();
   while (got < n) {
     int r = s.readBytes(dst + got, n - got);
-    if (r > 0) got += (size_t)r;
-    if (millis() - t0 > 2000) return false;
+    if (r > 0)
+      got += (size_t)r;
+    if (millis() - t0 > 2000)
+      return false;
     delay(0);
   }
   return true;
@@ -190,7 +186,8 @@ void setup() {
 
   if (!audio.begin(cfg)) {
     Serial.println("audio.begin FAILED");
-    while (true);
+    while (true)
+      ;
   }
 
   audio.setVolume(0.3f);
@@ -221,71 +218,71 @@ void loop() {
     ts += FRAME_SAMPLES;
   }
 
-// ===== AUDIO STREAMING =====
-// if (read_exact(audio, frame, FRAME_BYTES)) {
+  // ===== AUDIO STREAMING =====
+  // if (read_exact(audio, frame, FRAME_BYTES)) {
 
-//   int16_t *sample = (int16_t*)frame;
-//   int16_t max_val = 0;
+  //   int16_t *sample = (int16_t*)frame;
+  //   int16_t max_val = 0;
 
-//   for (int i = 0; i < FRAME_SAMPLES; i++) {
-//     if (abs(sample[i]) > max_val) {
-//       max_val = abs(sample[i]);
-//     }
-//   }
+  //   for (int i = 0; i < FRAME_SAMPLES; i++) {
+  //     if (abs(sample[i]) > max_val) {
+  //       max_val = abs(sample[i]);
+  //     }
+  //   }
 
-//   Serial.print("Audio Frame OK | Max Amplitude: ");
-//   Serial.println(max_val);
+  //   Serial.print("Audio Frame OK | Max Amplitude: ");
+  //   Serial.println(max_val);
 
-//   pkt[0] = seq & 0xFF;
-//   pkt[1] = (seq >> 8) & 0xFF;
-//   pkt[2] = ts & 0xFF;
-//   pkt[3] = (ts >> 8) & 0xFF;
-//   pkt[4] = (ts >> 16) & 0xFF;
-//   pkt[5] = (ts >> 24) & 0xFF;
+  //   pkt[0] = seq & 0xFF;
+  //   pkt[1] = (seq >> 8) & 0xFF;
+  //   pkt[2] = ts & 0xFF;
+  //   pkt[3] = (ts >> 8) & 0xFF;
+  //   pkt[4] = (ts >> 16) & 0xFF;
+  //   pkt[5] = (ts >> 24) & 0xFF;
 
-//   memcpy(pkt + 6, frame, FRAME_BYTES);
+  //   memcpy(pkt + 6, frame, FRAME_BYTES);
 
-//   udp_audio.beginPacket(PC_IP, PC_PORT);
-//   udp_audio.write(pkt, sizeof(pkt));
-//   udp_audio.endPacket();
+  //   udp_audio.beginPacket(PC_IP, PC_PORT);
+  //   udp_audio.write(pkt, sizeof(pkt));
+  //   udp_audio.endPacket();
 
-//   seq++;
-//   ts += FRAME_SAMPLES;
-// }
+  //   seq++;
+  //   ts += FRAME_SAMPLES;
+  // }
 
   // ===== RECEIVE TEXT (DEBUG VERSION) =====
-int packetSize = udp_text.parsePacket();
+  int packetSize = udp_text.parsePacket();
 
-if (packetSize > 0) {
+  if (packetSize > 0) {
 
-  Serial.println("========== TEXT PACKET RECEIVED ==========");
-  Serial.print("From IP: ");
-  Serial.println(udp_text.remoteIP());
+    Serial.println("========== TEXT PACKET RECEIVED ==========");
+    Serial.print("From IP: ");
+    Serial.println(udp_text.remoteIP());
 
-  Serial.print("From Port: ");
-  Serial.println(udp_text.remotePort());
+    Serial.print("From Port: ");
+    Serial.println(udp_text.remotePort());
 
-  Serial.print("Packet size: ");
-  Serial.println(packetSize);
+    Serial.print("Packet size: ");
+    Serial.println(packetSize);
 
-  char incoming[256];
-  int len = udp_text.read(incoming, sizeof(incoming) - 1);
+    char incoming[256];
+    int len = udp_text.read(incoming, sizeof(incoming) - 1);
 
-  if (len > 0) {
-    incoming[len] = 0;
+    if (len > 0) {
+      incoming[len] = 0;
 
-    Serial.print("Text length: ");
-    Serial.println(len);
+      Serial.print("Text length: ");
+      Serial.println(len);
 
-    Serial.print("Recognized text: ");
-    Serial.println(incoming);
+      Serial.print("Recognized text: ");
+      Serial.println(incoming);
 
-    Serial.println("Forwarding to CYD via UART...");
-    SerialCYD.println(incoming);
+      Serial.println("Forwarding to CYD via UART...");
+      SerialCYD.println(incoming);
 
-    Serial.println("========== END PACKET ==========\n");
-  } else {
-    Serial.println("ERROR: Packet received but no data read!");
+      Serial.println("========== END PACKET ==========\n");
+    } else {
+      Serial.println("ERROR: Packet received but no data read!");
+    }
   }
-}
 }

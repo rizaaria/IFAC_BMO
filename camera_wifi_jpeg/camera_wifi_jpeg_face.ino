@@ -3,9 +3,8 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-
-const char *ssid = "SHIZUDELTA";
-const char *password = "rizaaria12";
+const char *ssid = "";
+const char *password = "";
 
 IPAddress pcIP(192, 168, 137, 1);
 const uint16_t udpPort = 5000;
